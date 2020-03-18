@@ -10,9 +10,7 @@
   "devDependencies": {
     "debug": "^4.1.1"
   },
-  {
-    "scripts": {
+  "scripts": {
         "bundle-dependencies": "bundle-dependencies"
-    }
   }
 }
