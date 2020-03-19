@@ -7,7 +7,7 @@ pool:
 steps:
 - task: ArtifactoryMaven@1
   inputs:
-    mavenPomFile: 'pom.xml'
+    mavenPomFile: 'maven-example/pom.xml'
     goals: 'clean install'
     artifactoryResolverService: 'ecosys'
     targetResolveReleaseRepo: 'libs-release'
