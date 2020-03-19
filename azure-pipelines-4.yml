@@ -19,7 +19,7 @@ steps:
         "files": [
           {
             "pattern": "generic-local/rabbit",
-            "target": "."
+            "target": "./"
           }
         ]
       }
