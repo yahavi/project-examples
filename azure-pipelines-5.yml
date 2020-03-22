@@ -17,6 +17,7 @@ steps:
     sourceRepo: 'libs-release'
     artifactoryDeployService: 'ecosys'
     targetRepo: 'libs-release-local'
+    useWrapper: true
     collectBuildInfo: true
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
