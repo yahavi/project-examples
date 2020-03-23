@@ -4,12 +4,14 @@ pool:
 steps:
 - task: ArtifactoryGradle@1
   inputs:
-    buildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
+    rootPath: 'gradle-examples/gradle-example-ci-server'
+    buildFile: 'build.gradle'
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys'
     sourceRepo: 'libs-release'
     artifactoryDeployService: 'ecosys'
     targetRepo: 'libs-release-local'
+    useWrapper: true
     collectBuildInfo: true
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
