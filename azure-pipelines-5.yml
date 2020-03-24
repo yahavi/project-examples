@@ -6,7 +6,7 @@ pool:
 steps:
 - task: ArtifactoryGradle@1
   inputs:
-    rootPath: 'gradle-examples/gradle-example-ci-server'
+    workDir: 'gradle-examples/gradle-example-ci/server'
     buildFile: 'build.gradle'
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys'
