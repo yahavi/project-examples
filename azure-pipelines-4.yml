@@ -6,7 +6,7 @@ pool:
 steps:
 - task: ArtifactoryGenericDownload@1
   inputs:
-    connection: 'ecosys'
+    artifactoryService: 'ecosys'
     specSource: 'taskConfiguration'
     fileSpec: |
       {
@@ -18,8 +18,6 @@ steps:
         ]
       }
     collectBuildInfo: true
-    buildName: '$(Build.DefinitionName)'
-    buildNumber: '$(Build.BuildNumber)'
     failNoOp: true
 - task: ArtifactoryGenericUpload@1
   inputs:
