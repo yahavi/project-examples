@@ -6,8 +6,8 @@ pool:
 steps:
 - task: ArtifactoryGradle@1
   inputs:
+    gradleBuildFile: 'build.gradle'
     workDir: 'gradle-examples/gradle-example-ci-server'
-    buildFile: 'build.gradle'
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys'
     sourceRepo: 'libs-release'
