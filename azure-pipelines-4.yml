@@ -4,7 +4,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: ArtifactoryGenericDownload@2
+- task: ArtifactoryGenericDownload@1
   inputs:
     connection: 'ecosys'
     specSource: 'taskConfiguration'
