@@ -19,3 +19,9 @@ steps:
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
     includeEnvVars: true
+
+- task: ArtifactoryPublishBuildInfo@1
+  inputs:
+    artifactoryService: 'ecosys'
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
