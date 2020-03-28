@@ -4,6 +4,12 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: ArtifactoryToolsInstaller@1
+  inputs:
+    artifactoryService: 'ecosys'
+    cliInstallationRepo: 'jfrog-cli'
+    installExtractors: true
+    extractorsInstallationRepo: 'jcenter'
 - task: ArtifactoryMaven@1
   inputs:
     mavenPomFile: 'maven-example/pom.xml'
