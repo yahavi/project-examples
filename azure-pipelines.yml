@@ -6,7 +6,7 @@ pool:
 steps:
 - task: ArtifactoryToolsInstaller@1
   inputs:
-    artifactoryService: 'ecosys'
+    artifactoryService: 'ecosys-token'
     cliInstallationRepo: 'jfrog-cli'
 - task: ArtifactoryMaven@1
   inputs:
