@@ -9,10 +9,10 @@ steps:
     gradleBuildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
     workDir: 'gradle-examples/gradle-example-ci-server'
     tasks: 'artifactoryPublish'
-    artifactoryResolverService: 'ecosys'
-    sourceRepo: 'libs-release'
-    artifactoryDeployService: 'ecosys'
-    targetRepo: 'libs-release-local'
+    # artifactoryResolverService: 'ecosys'
+    # sourceRepo: 'libs-release'
+    # artifactoryDeployerService: 'ecosys'
+    # targetRepo: 'libs-release-local'
     useWrapper: true
     collectBuildInfo: true
     buildName: '$(Build.DefinitionName)'
