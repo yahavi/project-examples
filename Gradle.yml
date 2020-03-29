@@ -11,7 +11,7 @@ steps:
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys'
     sourceRepo: 'libs-release'
-    artifactoryDeployService: 'ecosys'
+    artifactoryDeployerService: 'ecosys'
     targetRepo: 'libs-snapshot-local'
     usesPlugin: true
     useWrapper: true
