@@ -9,8 +9,8 @@ steps:
     gradleBuildFile: 'gradle-examples/gradle-example-publish/build.gradle'
     workDir: 'gradle-examples/gradle-example-publish'
     tasks: 'artifactoryPublish'
-    # artifactoryResolverService: 'ecosys'
-    # sourceRepo: 'libs-release'
+    artifactoryResolverService: 'ecosys'
+    sourceRepo: 'libs-release'
     artifactoryDeployerService: 'ecosys'
     targetRepo: 'libs-snapshot-local'
     usesPlugin: true
