@@ -8,6 +8,8 @@ steps:
   inputs:
     artifactoryService: 'ecosys'
     cliInstallationRepo: 'jfrog-cli'
+    installMavenExtractor: true
+    mavenInstallationRepo: 'jcenter'
 - task: ArtifactoryMaven@1
   inputs:
     mavenPomFile: 'maven-example/pom.xml'
