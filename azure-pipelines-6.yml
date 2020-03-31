@@ -1,0 +1,24 @@
+trigger: none
+
+pool:
+  vmImage: 'windows-latest'
+
+- script:
+  - task: ArtifactoryNpm@2
+    inputs:
+      command: 'install'
+      artifactoryService: 'ecosys'
+      sourceRepo: 'npm'
+      workingFolder: 'npm-example'
+      arguments: '--verbose'
+      collectBuildInfo: true
+      threads: '1'
+      buildName: '$(Build.DefinitionName)'
+      buildNumber: '$(Build.BuildNumber)'
+      includeEnvVars: true
+
+  - task: ArtifactoryPublishBuildInfo@1
+    inputs:
+      artifactoryService: 'ecosys'
+      buildName: '$(Build.DefinitionName)'
+      buildNumber: '$(Build.BuildNumber)'
