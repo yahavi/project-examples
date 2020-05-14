@@ -10,7 +10,7 @@ steps:
     arguments: 'restore'
     artifactoryService: 'ecosys'
     targetResolveRepo: 'robi-nuget-virtual'
-    solutionPath: 'nuget-example/multi-example/**/*.sln'
+    solutionPath: '**/*.sln'
     collectBuildInfo: true
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
