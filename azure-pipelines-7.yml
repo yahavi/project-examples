@@ -1,0 +1,23 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: ArtifactoryNuGet@2
+  inputs:
+    command: 'restore'
+    arguments: 'restore'
+    artifactoryService: 'ecosys'
+    targetResolveRepo: 'robi-nuget-virtual'
+    solutionPath: 'nuget-example/multi-example/**/*.sln'
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
+    includeEnvVars: true
