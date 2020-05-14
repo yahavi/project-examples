@@ -7,7 +7,6 @@ steps:
 - task: ArtifactoryNuGet@2
   inputs:
     command: 'restore'
-    arguments: 'restore'
     artifactoryService: 'ecosys'
     targetResolveRepo: 'robi-nuget-virtual'
     solutionPath: '**/*.sln'
