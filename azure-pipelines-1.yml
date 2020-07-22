@@ -1,0 +1,25 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+- task: ArtifactoryMaven@1
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'install'
+    artifactoryResolverService: 'ecosys'
+    targetResolveReleaseRepo: 'libs-release'
+    targetResolveSnapshotRepo: 'libs-snapshot'
+    artifactoryDeployService: 'ecosys'
+    targetDeployReleaseRepo: 'libs-release-local'
+    targetDeploySnapshotRepo: 'libs-snapshot-local'
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
+    includeEnvVars: true

@@ -1,0 +1,16 @@
+trigger: none 
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: ArtifactoryNuGet@2
+  inputs:
+    command: 'restore'
+    artifactoryService: 'ecosys'
+    targetResolveRepo: 'robi-nuget-virtual'
+    solutionPath: 'nuget-example/MyLogger.sln'
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
+    includeEnvVars: true

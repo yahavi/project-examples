@@ -1,0 +1,31 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: ArtifactoryToolsInstaller@1
+  inputs:
+    artifactoryService: 'ecosys'
+    cliInstallationRepo: 'jfrog-cli'
+    installMavenExtractor: true
+    mavenInstallationRepo: 'jcenter'
+- task: ArtifactoryMaven@1
+  inputs:
+    mavenPomFile: 'maven-example/pom.xml'
+    goals: 'clean install'
+    artifactoryResolverService: 'ecosys'
+    targetResolveReleaseRepo: 'libs-release'
+    targetResolveSnapshotRepo: 'libs-snapshot'
+    artifactoryDeployService: 'ecosys'
+    targetDeployReleaseRepo: 'libs-release-local'
+    targetDeploySnapshotRepo: 'libs-snapshot-local'
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
+    includeEnvVars: true
+- task: ArtifactoryPublishBuildInfo@1
+  inputs:
+    artifactoryService: 'ecosys'
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'

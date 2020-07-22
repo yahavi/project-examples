@@ -1,0 +1,44 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: ArtifactoryGenericDownload@1
+  inputs:
+    artifactoryService: 'ecosys'
+    specSource: 'taskConfiguration'
+    fileSpec: |
+      {
+        "files": [
+          {
+            "pattern": "generic-local/rabbit",
+            "target": "./"
+          }
+        ]
+      }
+    collectBuildInfo: true
+    failNoOp: true
+- task: ArtifactoryGenericUpload@1
+  inputs:
+    artifactoryService: 'ecosys'
+    specSource: 'taskConfiguration'
+    fileSpec: |
+      {
+        "files": [
+          {
+            "pattern": "rabbit",
+            "target": "generic-local/rabbit2"
+          }
+        ]
+      }
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
+    includeEnvVars: true
+    failNoOp: true
+- task: ArtifactoryPublishBuildInfo@1
+  inputs:
+    artifactoryService: 'ecosys'
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'

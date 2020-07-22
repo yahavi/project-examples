@@ -1,0 +1,25 @@
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: ArtifactoryGradle@1
+  inputs:
+    gradleBuildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
+    workDir: 'gradle-examples/gradle-example-ci-server'
+    tasks: 'artifactoryPublish'
+    artifactoryResolverService: 'ecosys'
+    sourceRepo: 'libs-release'
+    # artifactoryDeployerService: 'ecosys'
+    # targetRepo: 'libs-release-local'
+    useWrapper: true
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
+    includeEnvVars: true
+- task: ArtifactoryPublishBuildInfo@1
+  inputs:
+    artifactoryService: 'ecosys'
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
