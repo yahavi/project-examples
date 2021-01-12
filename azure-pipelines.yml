@@ -13,4 +13,4 @@ steps:
 - task: JfrogCli@1
   inputs:
     artifactoryService: 'ecosys'
-    command: 'jfrog rt ping'
+    command: 'jfrog rt rbc yahav 1 generic-local/README.md --dist-url https://ecosysjfrog.jfrog.io/distribution'
