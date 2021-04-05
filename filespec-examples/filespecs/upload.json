@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "pattern": "frog.txt",
+      "target": "generic-local/"
+    }
+  ]
+}

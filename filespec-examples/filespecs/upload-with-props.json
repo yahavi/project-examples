@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "pattern": "frog.txt",
+      "target": "generic-local/frog.txt",
+      "targetProps": "key=val"
+    }
+  ]
+}
