@@ -6,7 +6,7 @@ pool:
 steps:
 - task: ArtifactoryToolsInstaller@1
   inputs:
-    artifactoryService: 'ecosys'
+    artifactoryService: 'ecosys-token'
     cliInstallationRepo: 'jfrog-cli'
     installExtractors: true
     extractorsInstallationRepo: 'extractors'
@@ -14,10 +14,10 @@ steps:
   inputs:
     mavenPomFile: 'maven-example/pom.xml'
     goals: 'clean install'
-    artifactoryResolverService: 'ecosys'
+    artifactoryResolverService: 'ecosys-token'
     targetResolveReleaseRepo: 'libs-release'
     targetResolveSnapshotRepo: 'libs-snapshot'
-    artifactoryDeployService: 'ecosys'
+    artifactoryDeployService: 'ecosys-token'
     targetDeployReleaseRepo: 'libs-release-local'
     targetDeploySnapshotRepo: 'libs-snapshot-local'
     collectBuildInfo: true
@@ -26,6 +26,6 @@ steps:
     includeEnvVars: true
 - task: ArtifactoryPublishBuildInfo@1
   inputs:
-    artifactoryService: 'ecosys'
+    artifactoryService: 'ecosys-token'
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
