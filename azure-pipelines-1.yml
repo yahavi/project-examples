@@ -9,9 +9,10 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-- task: ArtifactoryMaven@1
+steps:
+- task: ArtifactoryMaven@2
   inputs:
-    mavenPomFile: 'pom.xml'
+    mavenPomFile: 'maven-example/pom.xml'
     goals: 'install'
     artifactoryResolverService: 'ecosys'
     targetResolveReleaseRepo: 'libs-release'
@@ -22,4 +23,3 @@ pool:
     collectBuildInfo: true
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
-    includeEnvVars: true
