@@ -9,7 +9,7 @@ steps:
     artifactoryService: 'ecosys'
     cliInstallationRepo: 'jfrog-cli-remote'
     installCustomVersion: true
-    cliVersion: '1.46.2'
+    cliVersion: '1.46.3'
     
 - task: ArtifactoryGenericUpload@1
   inputs:
