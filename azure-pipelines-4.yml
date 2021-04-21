@@ -4,6 +4,13 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: ArtifactoryToolsInstaller@1
+  inputs:
+    artifactoryService: 'ecosys'
+    cliInstallationRepo: 'jfrog-cli-remote'
+    installCustomVersion: true
+    cliVersion: '1.46.2'
+    
 - task: ArtifactoryGenericUpload@1
   inputs:
     artifactoryService: 'ecosys'
