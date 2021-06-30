@@ -7,7 +7,7 @@ resources:
       buildOn:
         commit: false
       branches:
-        include: master
+        include: pipelines-test
 
 pipelines:
   - name: build_yahav_test
