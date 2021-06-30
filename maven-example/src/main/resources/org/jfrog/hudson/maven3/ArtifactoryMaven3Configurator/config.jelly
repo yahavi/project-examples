@@ -1,0 +1,282 @@
+<!--
+  ~ Copyright (C) 2010 JFrog Ltd.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form"
+         xmlns:r="/lib/jfrog"
+         xmlns:st="jelly:stapler">
+    <f:section title="${%Artifactory Configuration}">
+        <j:set var="uniqueId" value="${h.generateId()}"/>
+        <f:dropdownList name="deployerDetails" title="${%Artifactory server}">
+            <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+                <f:dropdownListBlock value="${s.instanceId}" title="${s.instanceId} ${s.artifactoryUrl}" selected="${s.instanceId==instance.artifactoryName}">
+                    <f:nested>
+                        <input type="hidden" name="artifactoryName" value="${s.instanceId}"/>
+                        <input type="hidden" name="artifactoryUrl" id="artifactoryUrlDeploy${s.artifactoryUrl}" value="${s.artifactoryUrl}"/>
+                        <input type="hidden" name="stapler-class" value="org.jfrog.hudson.ServerDetails"/>
+                        <r:dynamicRepos id="maven3RepositoryKeys-${s.artifactoryUrl}-${uniqueId}"
+                                        title="Target releases repository"
+                                        field="deployReleaseRepository"
+                                        repositoryConf="${instance.deployerDetails.deployReleaseRepository}"
+                                        repositories="${instance.releaseRepositoryList}"
+                                        helpUrl="/plugin/artifactory/help/common/help-deployReleases.html"/>
+
+                        <r:dynamicRepos id="maven3SnapshotsRepositoryKeys-${s.artifactoryUrl}-${uniqueId}"
+                                        title="Target snapshots repository"
+                                        field="deploySnapshotRepository"
+                                        repositoryConf="${instance.deployerDetails.deploySnapshotRepository}"
+                                        repositories="${instance.snapshotRepositoryList}"
+                                        helpUrl="/plugin/artifactory/help/common/help-deploySnapshots.html"/>
+
+                        <script>
+                            var maven3DeployBind =
+                            <st:bind value="${descriptor}"/>;
+                        </script>
+                        <r:repos bind="maven3DeployBind"
+                                 jsFunction="artifactoryMaven3Configurator"
+                                 repoUrl="artifactoryUrlDeploy${s.artifactoryUrl}"
+                                 credentialsDescriber="overridingDeployerCredentials-maven3-${uniqueId}"/>
+                    </f:nested>
+                </f:dropdownListBlock>
+            </j:forEach>
+        </f:dropdownList>
+
+        <r:credentials configurationFieldName="deployerCredentialsConfig"
+                       configurationObject="${instance.deployerCredentialsConfig}"
+                       blockTitle="Override default deployer credentials"
+                       elementId="overridingDeployerCredentials-maven3-${uniqueId}"/>
+
+        <f:block>
+            <r:blockWrapper style="width:100%">
+                <f:optionalBlock field="enableResolveArtifacts"
+                                 help="/plugin/artifactory/help/ArtifactoryMaven3NativeConfigurator/help.html"
+                                 title="Resolve artifacts from Artifactory"
+                                 inline="true"
+                                 checked="${instance.enableResolveArtifacts}">
+
+                    <f:dropdownList name="resolverDetails" title="${%Artifactory server}">
+                        <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+                            <f:dropdownListBlock value="${s.instanceId}" title="${s.instanceId} ${s.artifactoryUrl}"
+                                                 selected="${s.instanceId==instance.resolverDetails.artifactoryName}">
+
+                                <f:nested>
+                                    <input type="hidden" name="artifactoryName" value="${s.instanceId}"/>
+                                    <input type="hidden" name="artifactoryUrl" id="artifactoryUrlResolve${s.artifactoryUrl}"
+                                           value="${s.artifactoryUrl}"/>
+                                    <input type="hidden" name="stapler-class" value="org.jfrog.hudson.ServerDetails"/>
+                                    <input type="hidden" name="downloadReleaseRepositoryDisplayName"
+                                           id="downloadReleaseRepositoryDisplayName-maven3-${s.artifactoryUrl}"
+                                           value="${instance.resolverDetails.downloadReleaseRepositoryDisplayName}"/>
+                                    <input type="hidden" name="downloadSnapshotRepositoryDisplayName"
+                                           id="downloadSnapshotRepositoryDisplayName-maven3-${s.artifactoryUrl}"
+                                           value="${instance.resolverDetails.downloadSnapshotRepositoryDisplayName}"/>
+
+                                    <r:dynamicRepos id="maven3NativeReleaseRepositoryKeys-${s.artifactoryUrl}-${uniqueId}"
+                                                    title="Resolution releases repository"
+                                                    field="resolveReleaseRepository"
+                                                    repositoryConf="${instance.resolverDetails.resolveReleaseRepository}"
+                                                    repositories="${instance.resolveReleaseRepositoryList}"/>
+
+                                    <r:dynamicRepos id="maven3NativeSnapshotRepositoryKeys-${s.artifactoryUrl}-${uniqueId}"
+                                                    title="Resolution snapshots repository"
+                                                    field="resolveSnapshotRepository"
+                                                    repositoryConf="${instance.resolverDetails.resolveSnapshotRepository}"
+                                                    repositories="${instance.resolveSnapshotRepositoryList}"/>
+                                    <script>
+                                        var maven3ResolveBind =
+                                        <st:bind value="${descriptor}"/>
+                                    </script>
+                                    <r:repos bind="maven3ResolveBind"
+                                             jsFunction="artifactoryMaven3NativeConfigurator"
+                                             repoUrl="artifactoryUrlResolve${s.artifactoryUrl}"
+                                             credentialsDescriber="overridingResolverCredentials-maven3-${uniqueId}"/>
+                                </f:nested>
+                            </f:dropdownListBlock>
+                        </j:forEach>
+                    </f:dropdownList>
+
+                    <r:credentials configurationFieldName="resolverCredentialsConfig"
+                                   configurationObject="${instance.resolverCredentialsConfig}"
+                                   blockTitle="Override default resolver credentials"
+                                   elementId="overridingResolverCredentials-maven3-${uniqueId}"/>
+                </f:optionalBlock>
+            </r:blockWrapper>
+        </f:block>
+        <f:block>
+            <r:blockWrapper style="width:100%">
+                <f:optionalBlock field="overrideBuildName"
+                                 help="/plugin/artifactory/help/common/help-overrideBuildName.html"
+                                 title="Override build name" inline="true"
+                                 checked="${instance.overrideBuildName}">
+                    <f:block>
+                        <f:entry title="Build name" field="customBuildName"
+                                 help="/plugin/artifactory/help/common/help-customizedBuildName.html">
+                            <f:textbox value="${instance.customBuildName}"/>
+                        </f:entry>
+                    </f:block>
+                </f:optionalBlock>
+            </r:blockWrapper>
+        </f:block>
+        <f:block>
+            <r:blockWrapper style="width:100%">
+                <f:optionalBlock field="deployArtifacts"
+                                 help="/plugin/artifactory/help/common/help-deployArtifacts.html"
+                                 title="Deploy artifacts to Artifactory" inline="true"
+                                 checked="${h.defaultToTrue(instance.deployArtifacts)}">
+
+                    <f:block>
+                        <j:if test="${descriptor.isMultiConfProject()}">
+                            <f:block>
+                                <r:blockWrapper style="width:100%">
+                                    <f:entry field="artifactoryCombinationFilter" title="${%Combination Matches}"
+                                             description="Groovy expression"
+                                             help="/plugin/artifactory/help/common/help-combinationFilter.html">
+                                        <f:textbox value="${instance.artifactoryCombinationFilter}"
+                                                   field="artifactoryCombinationFilter"/>
+                                    </f:entry>
+                                </r:blockWrapper>
+                            </f:block>
+                        </j:if>
+                    </f:block>
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <j:set var="artifactDeploymentPatterns" value="${instance.artifactDeploymentPatterns}"/>
+                            <f:section name="artifactDeploymentPatterns">
+                                <input type="hidden" name="stapler-class"
+                                       value="org.jfrog.hudson.util.IncludesExcludes"/>
+                                <f:entry title="Include Patterns" field="includePatterns"
+                                         help="/plugin/artifactory/help/common/help-deployedArtifactIncludePattern.html">
+                                    <f:textbox value="${artifactDeploymentPatterns.includePatterns}"/>
+                                </f:entry>
+                                <f:entry title="Exclude Patterns"
+                                         field="excludePatterns"
+                                         help="/plugin/artifactory/help/common/help-deployedArtifactExcludePattern.html">
+                                    <f:textbox value="${artifactDeploymentPatterns.excludePatterns}"/>
+                                </f:entry>
+                            </f:section>
+                        </r:blockWrapper>
+                    </f:block>
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <f:optionalBlock field="filterExcludedArtifactsFromBuild"
+                                             help="/plugin/artifactory/help/common/help-filterExcludedArtifactsFromBuild.html"
+                                             title="Filter excluded artifacts from build Info"
+                                             checked="${h.defaultToTrue(instance.filterExcludedArtifactsFromBuild)}"
+                                             inline="true">
+                            </f:optionalBlock>
+                        </r:blockWrapper>
+                    </f:block>
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <f:entry title="Deployment properties" field="deploymentProperties"
+                                     help="/plugin/artifactory/help/common/help-deploymentProperties.html">
+                                <f:textbox value="${instance.deploymentProperties}"/>
+                            </f:entry>
+                        </r:blockWrapper>
+                    </f:block>
+                </f:optionalBlock>
+            </r:blockWrapper>
+        </f:block>
+        <f:block>
+            <r:blockWrapper style="width:100%">
+                <f:optionalBlock name="deployBuildInfo" checked="${h.defaultToTrue(instance.deployBuildInfo)}"
+                                 title="Capture and publish build info"
+                                 help="/plugin/artifactory/help/common/help-deployBuildInfo.html"
+                                 inline="true">
+                    <f:optionalBlock name="includeEnvVars" checked="${instance.includeEnvVars}"
+                                     title="Include environment variables"
+                                     help="/plugin/artifactory/help/common/help-includeEnvVars.html"
+                                     inline="true">
+                        <f:block>
+                            <r:blockWrapper style="width:100%">
+                                <j:set var="envVarsPatterns" value="${instance.envVarsPatterns}"/>
+                                <f:section name="envVarsPatterns">
+                                    <input type="hidden" name="stapler-class"
+                                           value="org.jfrog.hudson.util.IncludesExcludes"/>
+                                    <f:entry title="Include Patterns" field="includePatterns"
+                                             help="/plugin/artifactory/help/common/help-envVarsIncludePatterns.html">
+                                        <f:textbox value="${envVarsPatterns.includePatterns}"/>
+                                    </f:entry>
+                                    <f:entry title="Exclude Patterns"
+                                             field="excludePatterns"
+                                             help="/plugin/artifactory/help/common/help-envVarsExcludePatterns.html">
+                                        <f:textbox value="${envVarsPatterns.excludePatterns}"
+                                                   default="*password*,*psw*,*secret*,*key*,*token*"/>
+                                    </f:entry>
+                                </f:section>
+                            </r:blockWrapper>
+                        </f:block>
+                    </f:optionalBlock>
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <f:optionalBlock field="recordAllDependencies"
+                                             help="/plugin/artifactory/help/common/help-recordAllDependencies.html"
+                                             title="Record implicit project dependencies and build-time dependencies"
+                                             inline="true">
+                            </f:optionalBlock>
+                        </r:blockWrapper>
+                    </f:block>
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <f:optionalBlock name="discardOldBuilds"
+                                             checked="${instance.discardOldBuilds}"
+                                             title="Discard old builds from Artifactory (requires Artifactory Pro)"
+                                             inline="true"
+                                             help="/plugin/artifactory/help/common/help-discardBuilds.html">
+                                <f:entry field="discardBuildArtifacts"
+                                         help="/plugin/artifactory/help/common/help-discardBuildArtifacts.html">
+                                    <f:checkbox default="true" checked="${instance.discardBuildArtifacts}"/>
+                                    <label class="attach-previous">${%Discard build artifacts}</label>
+                                </f:entry>
+                                <f:entry field="asyncBuildRetention"
+                                         help="/plugin/artifactory/help/common/help-asyncBuildRetention.html">
+                                    <f:checkbox default="false" checked="${instance.asyncBuildRetention}"/>
+                                    <label class="attach-previous">${%Async}</label>
+                                </f:entry>
+                            </f:optionalBlock>
+                        </r:blockWrapper>
+                    </f:block>
+                </f:optionalBlock>
+            </r:blockWrapper>
+        </f:block>
+        <f:block>
+            <r:blockWrapper style="width:100%">
+                <j:if test="${descriptor.jiraPluginEnabled}">
+                    <f:optionalBlock name="enableIssueTrackerIntegration"
+                                     checked="${instance.enableIssueTrackerIntegration}"
+                                     title="Enable JIRA Integration"
+                                     help="/plugin/artifactory/help/common/help-enableIssueTrackerIntegration.html"
+                                     inline="true">
+
+                        <f:optionalBlock name="aggregateBuildIssues"
+                                         checked="${instance.aggregateBuildIssues}"
+                                         title="Aggregate issues from previous builds"
+                                         inline="true"
+                                         help="/plugin/artifactory/help/common/help-aggregateBuildIssues.html">
+                            <f:entry field="aggregationBuildStatus" title="${%Aggregate from status}"
+                                     description="Define the latest build status to stop the aggregation at">
+                                <f:textbox value="${instance.aggregationBuildStatus}" default="Released"/>
+                            </f:entry>
+                        </f:optionalBlock>
+                    </f:optionalBlock>
+                </j:if>
+            </r:blockWrapper>
+        </f:block>
+    </f:section>
+    <f:block>
+        <hr/>
+    </f:block>
+</j:jelly>

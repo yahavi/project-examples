@@ -1,0 +1,17 @@
+package integration.pipelines.scripted
+
+node("TestSlave") {
+    stage "Configuration"
+    def rtServer = Artifactory.newServer url: "${env.JENKINS_PLATFORM_URL}".replaceFirst('/*$', '')+'/artifactory', username: "${env.JENKINS_ARTIFACTORY_USERNAME}", password: "${env.JENKINS_ARTIFACTORY_PASSWORD}"
+
+    stage "Upload"
+    def uploadSpec = """{
+      "files": [
+        {
+          "pattern": "NOT_EXISTS",
+          "target": "${LOCAL_REPO1}/"
+        }
+     ]
+    }"""
+    rtServer.upload spec: uploadSpec, failNoOp: true
+}

@@ -1,0 +1,24 @@
+package integration.pipelines.scripted
+
+node("TestSlave") {
+    stage "Configuration"
+    def rtServer = Artifactory.newServer url: "${env.JENKINS_PLATFORM_URL}".replaceFirst('/*$', '')+'/artifactory', username: "${env.JENKINS_ARTIFACTORY_USERNAME}", password: "${env.JENKINS_ARTIFACTORY_PASSWORD}"
+    def buildInfo = Artifactory.newBuildInfo()
+    buildInfo.name = "scripted:downloadByPattern test"
+    buildInfo.number = "3"
+
+    stage "Download"
+    def downloadSpec = """{
+      "files": [
+        {
+          "pattern": "${LOCAL_REPO1}/*",
+          "target": "downloadByPattern-test/",
+          "recursive": "false"
+        }
+     ]
+    }"""
+    rtServer.download spec: downloadSpec, buildInfo: buildInfo
+
+    stage "Publish Build Info"
+    rtServer.publishBuildInfo buildInfo
+}

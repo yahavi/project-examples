@@ -1,0 +1,272 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:r="/lib/jfrog" xmlns:st="jelly:stapler">
+    <j:set var="uniqueId" value="${h.generateId()}"/>
+    <f:dropdownList name="deployerDetails" title="${%Artifactory server}">
+        <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+            <f:dropdownListBlock value="${s.instanceId}" title="${s.artifactoryUrl}" selected="${s.instanceId==instance.artifactoryName}">
+                <f:nested>
+                    <input type="hidden" name="artifactoryName" value="${s.instanceId}"/>
+                    <input type="hidden" name="artifactoryUrl" id="artifactoryUrlDeploy${s.artifactoryUrl}" value="${s.artifactoryUrl}"/>
+                    <input type="hidden" name="stapler-class" value="org.jfrog.hudson.ServerDetails"/>
+
+                    <r:dynamicRepos id="publishRepositoryKey-${s.artifactoryUrl}-${uniqueId}"
+                                    field="deployReleaseRepository"
+                                    title="Target releases repository"
+                                    repositoryConf="${instance.deployerDetails.deployReleaseRepository}"
+                                    repositories="${instance.releaseRepositoryList}"
+                                    helpUrl="/plugin/artifactory/help/common/help-deployReleases.html"/>
+
+                    <r:dynamicRepos id="publishSnapshotsRepositoryKeys-${s.artifactoryUrl}-${uniqueId}"
+                                    title="Target snapshot repository"
+                                    field="deploySnapshotRepository"
+                                    repositoryConf="${instance.deployerDetails.deploySnapshotRepository}"
+                                    repositories="${instance.snapshotRepositoryList}"
+                                    helpUrl="/plugin/artifactory/help/common/help-deploySnapshots.html"/>
+
+                    <f:entry title="${%Custom staging configuration}"
+                             help="/plugin/artifactory/help/release/common/help-stagingPlugin.html">
+                        <select class="setting-input" name="userPluginKey" id="customStagingConfiguration-${s.artifactoryUrl}-${uniqueId}"
+                                onchange="setStagingParamsSelectedValue(this)">
+                            <j:choose>
+                                <j:when test="${s.instanceId==instance.artifactoryName}">
+                                    <j:choose>
+                                        <f:option selected="${instance.deployerDetails.stagingPlugin.pluginName}"
+                                                  value="${instance.deployerDetails.stagingPlugin.pluginName}">
+                                            ${instance.deployerDetails.stagingPlugin.pluginName}
+                                        </f:option>
+                                    </j:choose>
+                                </j:when>
+                            </j:choose>
+                        </select>
+                        <div id="stagingParamsDiv-${uniqueId}">
+                            <j:choose>
+                                <j:when test="${s.instanceId==instance.artifactoryName}">
+                                    <j:choose>
+                                        <j:when test="${instance.deployerDetails.stagingPlugin != null}">
+                                            <j:choose>
+                                                <j:when test="${instance.deployerDetails.stagingPlugin.paramsString != ''}">
+                                                    <input class='setting-input' name='userPluginParams'
+                                                           id='stagingParams-${instance.deployerDetails.stagingPlugin.pluginName}-${uniqueId}'
+                                                           type='text'
+                                                           value='${instance.deployerDetails.stagingPlugin.paramsString}'/>
+                                                </j:when>
+                                            </j:choose>
+                                        </j:when>
+                                    </j:choose>
+                                </j:when>
+                            </j:choose>
+                        </div>
+                    </f:entry>
+                    <script>
+                        var bindToDescriptor =
+                        <st:bind value="${descriptor}"/>
+                    </script>
+                    <r:repos bind="bindToDescriptor"
+                             jsFunction="artifactoryRedeployPublisher"
+                             repoUrl="artifactoryUrlDeploy${s.artifactoryUrl}"
+                             credentialsDescriber="overridingDeployerCredentials-${uniqueId}"/>
+                </f:nested>
+            </f:dropdownListBlock>
+        </j:forEach>
+    </f:dropdownList>
+
+    <r:credentials configurationFieldName="deployerCredentialsConfig"
+                   configurationObject="${instance.deployerCredentialsConfig}"
+                   blockTitle="Override default deployer credentials"
+                   elementId="overridingDeployerCredentials-${uniqueId}"/>
+
+    <f:block>
+        <r:blockWrapper style="width:100%">
+            <f:optionalBlock field="evenIfUnstable"
+                             help="/plugin/artifactory/help/ArtifactoryRedeployPublisher/help-evenIfUnstable.html"
+                             title="Deploy even if the build is unstable"
+                             inline="true">
+            </f:optionalBlock>
+        </r:blockWrapper>
+    </f:block>
+    <f:block>
+        <r:blockWrapper style="width:100%">
+            <f:optionalBlock field="overrideBuildName"
+                             help="/plugin/artifactory/help/common/help-overrideBuildName.html"
+                             title="Override build name" inline="true"
+                             checked="${instance.overrideBuildName}">
+                <f:block>
+                    <f:entry title="Build name" field="customBuildName"
+                             help="/plugin/artifactory/help/common/help-customizedBuildName.html">
+                        <f:textbox value="${instance.customBuildName}"/>
+                    </f:entry>
+                </f:block>
+            </f:optionalBlock>
+        </r:blockWrapper>
+    </f:block>
+    <f:block>
+        <r:blockWrapper style="width:100%">
+            <f:optionalBlock field="deployArtifacts"
+                             help="/plugin/artifactory/help/common/help-deployArtifacts.html"
+                             title="Deploy maven artifacts"
+                             checked="${h.defaultToTrue(instance.deployArtifacts)}"
+                             inline="true">
+                <f:block>
+                    <r:blockWrapper style="width:100%">
+                        <j:set var="artifactDeploymentPatterns" value="${instance.artifactDeploymentPatterns}"/>
+                        <f:section name="artifactDeploymentPatterns">
+                            <input type="hidden" name="stapler-class"
+                                   value="org.jfrog.hudson.util.IncludesExcludes"/>
+                            <f:entry title="Include Patterns" field="includePatterns"
+                                     help="/plugin/artifactory/help/common/help-deployedArtifactIncludePattern.html">
+                                <f:textbox value="${artifactDeploymentPatterns.includePatterns}"/>
+                            </f:entry>
+                            <f:entry title="Exclude Patterns"
+                                     field="excludePatterns"
+                                     help="/plugin/artifactory/help/common/help-deployedArtifactExcludePattern.html">
+                                <f:textbox value="${artifactDeploymentPatterns.excludePatterns}"/>
+                            </f:entry>
+                        </f:section>
+                    </r:blockWrapper>
+                </f:block>
+                <f:block>
+                    <r:blockWrapper style="width:100%">
+                        <f:optionalBlock field="filterExcludedArtifactsFromBuild"
+                                         help="/plugin/artifactory/help/common/help-filterExcludedArtifactsFromBuild.html"
+                                         title="Filter excluded artifacts from build Info"
+                                         checked="${h.defaultToTrue(instance.filterExcludedArtifactsFromBuild)}"
+                                         inline="true">
+                        </f:optionalBlock>
+                    </r:blockWrapper>
+                </f:block>
+                <f:block>
+                    <r:blockWrapper style="width:100%">
+                        <f:entry title="Deployment properties" field="deploymentProperties"
+                                 help="/plugin/artifactory/help/common/help-deploymentProperties.html">
+                            <f:textbox value="${instance.deploymentProperties}"/>
+                        </f:entry>
+                    </r:blockWrapper>
+                </f:block>
+            </f:optionalBlock>
+        </r:blockWrapper>
+    </f:block>
+    <f:block>
+        <r:blockWrapper style="width:100%">
+            <f:optionalBlock name="deployBuildInfo" checked="${h.defaultToTrue(instance.deployBuildInfo)}"
+                             title="Capture and publish build info"
+                             help="/plugin/artifactory/help/common/help-deployBuildInfo.html"
+                             inline="true">
+
+                <f:optionalBlock name="includeEnvVars" checked="${instance.includeEnvVars}"
+                                 title="Include environment variables"
+                                 help="/plugin/artifactory/help/common/help-includeEnvVars.html"
+                                 inline="true">
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <j:set var="envVarsPatterns" value="${instance.envVarsPatterns}"/>
+                            <f:section name="envVarsPatterns">
+                                <input type="hidden" name="stapler-class"
+                                       value="org.jfrog.hudson.util.IncludesExcludes"/>
+                                <f:entry title="Include Patterns" field="includePatterns"
+                                         help="/plugin/artifactory/help/common/help-envVarsIncludePatterns.html">
+                                    <f:textbox value="${envVarsPatterns.includePatterns}"/>
+                                </f:entry>
+                                <f:entry title="Exclude Patterns"
+                                         field="excludePatterns"
+                                         help="/plugin/artifactory/help/common/help-envVarsExcludePatterns.html">
+                                    <f:textbox value="${envVarsPatterns.excludePatterns}"
+                                               default="*password*,*psw*,*secret*,*key*,*token*"/>
+                                </f:entry>
+                            </f:section>
+                        </r:blockWrapper>
+                    </f:block>
+                </f:optionalBlock>
+                <f:block>
+                    <r:blockWrapper style="width:100%">
+                        <f:optionalBlock field="recordAllDependencies"
+                                         help="/plugin/artifactory/help/common/help-recordAllDependencies.html"
+                                         title="Record implicit project dependencies and build-time dependencies"
+                                         inline="true">
+                        </f:optionalBlock>
+                    </r:blockWrapper>
+                </f:block>
+                <f:block>
+                    <r:blockWrapper style="width:100%">
+                        <f:optionalBlock field="allowPromotionOfNonStagedBuilds"
+                                         help="/plugin/artifactory/help/common/help-allowPromotionOfNonStagedBuilds.html"
+                                         title="Allow promotion of non-staged builds"
+                                         inline="true">
+                        </f:optionalBlock>
+                        <f:entry title="Default promotion target repository" field="defaultPromotionTargetRepository"
+                                 help="/plugin/artifactory/help/release/PromoteBuildAction/help-defaultPromotionTargetRepository.html">
+                            <f:textbox value="${instance.defaultPromotionTargetRepository}"/>
+                        </f:entry>
+                    </r:blockWrapper>
+                </f:block>
+                <f:block>
+                    <r:blockWrapper style="width:100%">
+                        <f:optionalBlock name="discardOldBuilds"
+                                         checked="${instance.discardOldBuilds}"
+                                         title="Discard old builds from Artifactory (requires Artifactory Pro)"
+                                         inline="true"
+                                         help="/plugin/artifactory/help/common/help-discardBuilds.html">
+                            <f:entry field="discardBuildArtifacts"
+                                     help="/plugin/artifactory/help/common/help-discardBuildArtifacts.html">
+                                <f:checkbox default="true" checked="${instance.discardBuildArtifacts}"/>
+                                <label class="attach-previous">${%Discard build artifacts}</label>
+                            </f:entry>
+                            <f:entry field="asyncBuildRetention"
+                                     help="/plugin/artifactory/help/common/help-asyncBuildRetention.html">
+                                <f:checkbox default="false" checked="${instance.asyncBuildRetention}"/>
+                                <label class="attach-previous">${%Async}</label>
+                            </f:entry>
+                        </f:optionalBlock>
+                    </r:blockWrapper>
+                </f:block>
+            </f:optionalBlock>
+        </r:blockWrapper>
+    </f:block>
+    <f:block>
+        <r:blockWrapper style="width:100%">
+            <f:optionalBlock field="passIdentifiedDownstream"
+                             help="/plugin/artifactory/help/common/help-passIdentifiedDownstream.html"
+                             title="Enable isolated resolution for downstream builds (requires Artifactory Pro)"
+                             inline="true">
+            </f:optionalBlock>
+        </r:blockWrapper>
+    </f:block>
+    <f:block>
+        <r:blockWrapper style="width:100%">
+            <j:if test="${descriptor.jiraPluginEnabled}">
+                <f:optionalBlock name="enableIssueTrackerIntegration"
+                                 checked="${instance.enableIssueTrackerIntegration}"
+                                 title="Enable JIRA Integration"
+                                 help="/plugin/artifactory/help/common/help-enableIssueTrackerIntegration.html"
+                                 inline="true">
+
+                    <f:optionalBlock name="aggregateBuildIssues"
+                                     checked="${instance.aggregateBuildIssues}"
+                                     title="Aggregate issues from previous builds"
+                                     inline="true"
+                                     help="/plugin/artifactory/help/common/help-aggregateBuildIssues.html">
+                        <f:entry field="aggregationBuildStatus" title="${%Aggregate from status}"
+                                 description="Define the latest build status to stop the aggregation at">
+                            <f:textbox value="${instance.aggregationBuildStatus}" default="Released"/>
+                        </f:entry>
+                    </f:optionalBlock>
+                </f:optionalBlock>
+            </j:if>
+        </r:blockWrapper>
+    </f:block>
+    <f:block>
+        <hr/>
+    </f:block>
+    <script>
+        function updateViewWithCredentials() {
+            try {
+                let credentialsPluginFlag = JSON.parse(document.getElementById('useCredentialsPluginoverridingDeployerCredentials').value);
+                let legacyCredentials = document.getElementById('legacyoverridingDeployerCredentials');
+                let credentialsPlugin = document.getElementById('overridingDeployerCredentials-${uniqueId}');
+                legacyCredentials.style.display = credentialsPluginFlag ? 'none' : '';
+                credentialsPlugin.style.display = credentialsPluginFlag ? '' : 'none';
+            } catch (exception) {
+                setTimeout(updateViewWithCredentials, 0);
+            }
+        }
+        updateViewWithCredentials();
+    </script>
+</j:jelly>

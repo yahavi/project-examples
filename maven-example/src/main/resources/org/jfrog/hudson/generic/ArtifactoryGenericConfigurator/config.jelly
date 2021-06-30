@@ -1,0 +1,334 @@
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form"
+         xmlns:r="/lib/jfrog" xmlns:st="jelly:stapler">
+
+    <f:section title="${%Artifactory Configuration}">
+        <j:set var="uniqueId" value="${h.generateId()}"/>
+        <j:set var="useSpecs" value="${instance.useSpecs ?: true}"/>
+        <input type="hidden" name="useSpecs" value="${useSpecs}"/>
+
+        <f:block>
+            <lable style="margin: 10px 0px 5px -10px; line-height: 3; font-size: 1.3em; padding: 10px 15px;
+                              font-weight: bold; box-sizing: border-box;">
+                Upload Details
+            </lable>
+
+            <j:choose>
+                <j:when test="${useSpecs}">
+                    <r:blockWrapper style="width:100%" id="artifactory-deployer-spec-dd-${uniqueId}">
+                        <f:dropdownList name="specsDeployerDetails" title="${%Artifactory upload server}">
+                            <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+                                <f:dropdownListBlock value="${s.instanceId}" title="${s.instanceId} ${s.artifactoryUrl}"
+                                                     selected="${s.instanceId==instance.specsDeployerDetails.artifactoryName}">
+                                    <f:nested>
+                                        <input type="hidden" name="artifactoryName" value="${s.instanceId}"/>
+                                        <input type="hidden" name="artifactoryUrl"
+                                               id="artifactoryUrlDeploy${s.artifactoryUrl}"
+                                               value="${s.artifactoryUrl}"/>
+                                        <input type="hidden" name="stapler-class"
+                                               value="org.jfrog.hudson.ServerDetails"/>
+                                    </f:nested>
+                                </f:dropdownListBlock>
+                            </j:forEach>
+                        </f:dropdownList>
+                    </r:blockWrapper>
+                    <r:credentials configurationFieldName="deployerCredentialsConfig"
+                                   configurationObject="${instance.deployerCredentialsConfig}"
+                                   blockTitle="Override default deployer credentials"
+                                   elementId="overridingDeployerCredentials-generic-${uniqueId}"/>
+
+                    <f:block>
+                        <r:blockWrapper style="width:100%; " id="uploadSpecArea-${uniqueId}">
+                            <f:dropdownList name="uploadSpec" title="${%Upload spec source}"
+                                            help="/plugin/artifactory/help/common/help-UploadSpec.html">
+
+                                <!-- Spec should be selected by default, the selected below maintains it -->
+                                <f:dropdownListBlock value="spec" title="${%Job configuration}"
+                                                     selected="${instance.uploadSpec.filePath == null}">
+                                    <tr>
+                                        <td>
+                                            <r:blockWrapper style="width:100%" id="uploadSpecArea-${uniqueId}">
+                                                <f:entry title="Spec" field="spec">
+                                                    <f:textarea value="${instance.uploadSpec.spec}"/>
+                                                </f:entry>
+                                            </r:blockWrapper>
+                                        </td>
+                                    </tr>
+                                </f:dropdownListBlock>
+
+                                <f:dropdownListBlock value="file" title="${%File}"
+                                                     selected="${instance.uploadSpec.filePath != null}">
+                                    <tr>
+                                        <td>
+                                            <r:blockWrapper style="width:100%">
+                                                <f:entry title="File Path" field="filePath">
+                                                    <f:textbox value="${instance.uploadSpec.filePath}"/>
+                                                </f:entry>
+                                            </r:blockWrapper>
+                                        </td>
+                                    </tr>
+                                </f:dropdownListBlock>
+
+                            </f:dropdownList>
+                        </r:blockWrapper>
+                    </f:block>
+                </j:when>
+                <j:otherwise>
+                    <r:blockWrapper style="width:100%" id="artifactory-deployer-generic-dd-${uniqueId}">
+
+                        <f:dropdownList name="legacyDeployerDetails"
+                                        title="${%Artifactory upload server}">
+                            <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+                                <f:dropdownListBlock value="${s.instanceId}" title="${s.instanceId} ${s.artifactoryUrl}"
+                                                     selected="${s.instanceId==instance.legacyDeployerDetails.artifactoryName}">
+                                    <f:nested>
+                                        <input type="hidden" name="artifactoryName" value="${s.instanceId}"/>
+                                        <input type="hidden" name="artifactoryUrl"
+                                               id="artifactoryUrlDeploy${s.artifactoryUrl}"
+                                               value="${s.artifactoryUrl}"/>
+                                        <input type="hidden" name="stapler-class"
+                                               value="org.jfrog.hudson.ServerDetails"/>
+
+                                        <r:dynamicRepos id="genericRepositoryKeys-${s.artifactoryUrl}-${uniqueId}"
+                                                        title="Target Repository"
+                                                        field="deployReleaseRepository"
+                                                        repositoryConf="${instance.legacyDeployerDetails.deployReleaseRepository}"
+                                                        repositories="${instance.releaseRepositoryList}"
+                                                        helpUrl="/plugin/artifactory/help/common/help-deployRepository.html"/>
+
+                                        <script>
+                                            var genericDeployBind =
+                                            <st:bind value="${descriptor}"/>
+                                        </script>
+                                        <r:repos bind="genericDeployBind"
+                                                 jsFunction="artifactoryGenericConfigurator"
+                                                 repoUrl="artifactoryUrlDeploy${s.artifactoryUrl}"
+                                                 credentialsDescriber="overridingDeployerCredentials-generic-${uniqueId}"/>
+
+                                    </f:nested>
+                                </f:dropdownListBlock>
+                            </j:forEach>
+                        </f:dropdownList>
+                    </r:blockWrapper>
+                    <r:credentials configurationFieldName="deployerCredentialsConfig"
+                                   configurationObject="${instance.deployerCredentialsConfig}"
+                                   blockTitle="Override default deployer credentials"
+                                   elementId="overridingDeployerCredentials-generic-${uniqueId}"/>
+
+                    <f:block>
+                        <r:blockWrapper style="width:100%" id="deployPatternArea-${uniqueId}">
+                            <f:entry title="Published Artifacts" field="deployPattern"
+                                     help="/plugin/artifactory/help/common/help-deployPattern.html">
+                                <f:textarea value="${instance.deployPattern}"/>
+                            </f:entry>
+                            <f:entry title="Upload properties" field="deploymentProperties"
+                                     help="/plugin/artifactory/help/common/help-deploymentProperties.html">
+                                <f:textbox value="${instance.deploymentProperties}"/>
+                            </f:entry>
+                        </r:blockWrapper>
+                    </f:block>
+                </j:otherwise>
+            </j:choose>
+        </f:block>
+
+
+        <f:block>
+            <lable style="margin: 10px 0px 5px -10px; line-height: 3; font-size: 1.3em; padding: 10px 15px;
+                                      font-weight: bold; box-sizing: border-box;">
+                Download Details
+            </lable>
+            <j:choose>
+                <j:when test="${useSpecs}">
+                    <f:block>
+                        <r:blockWrapper style="width:100%" id="artifactory-resolver-spec-dd-${uniqueId}">
+                            <f:dropdownList name="specsResolverDetails" title="${%Artifactory download server}">
+                                <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+                                    <f:dropdownListBlock value="${s.instanceId}" title="${s.instanceId} ${s.artifactoryUrl}"
+                                                         selected="${s.instanceId==instance.specsResolverDetails.artifactoryName}">
+                                        <f:nested>
+                                            <input type="hidden" name="artifactoryName" value="${s.id}"/>
+                                            <input type="hidden" name="artifactoryUrl"
+                                                   id="artifactoryUrlResolve${s.artifactoryUrl}"
+                                                   value="${s.artifactoryUrl}"/>
+                                            <input type="hidden" name="stapler-class"
+                                                   value="org.jfrog.hudson.ServerDetails"/>
+
+                                        </f:nested>
+                                    </f:dropdownListBlock>
+                                </j:forEach>
+                            </f:dropdownList>
+                        </r:blockWrapper>
+                    </f:block>
+                    <r:credentials configurationFieldName="resolverCredentialsConfig"
+                                   configurationObject="${instance.resolverCredentialsConfig}"
+                                   blockTitle="Override default download credentials"
+                                   elementId="overridingResolverCredentials-generic-${uniqueId}"/>
+
+
+                    <f:block>
+                        <r:blockWrapper style="width:100%" id="downloadSpecArea-${uniqueId}">
+                            <f:dropdownList name="downloadSpec" title="${%Download spec source}"
+                                            help="/plugin/artifactory/help/common/help-DownloadSpec.html">
+
+                                <!-- Spec should be selected by default, the selected below maintains it -->
+                                <f:dropdownListBlock value="spec" title="${%Job configuration}"
+                                                     selected="${instance.downloadSpec.filePath == null}">
+                                    <tr>
+                                        <td>
+                                            <r:blockWrapper style="width:100%" id="downloadSpecArea">
+                                                <f:entry title="Spec" field="spec">
+                                                    <f:textarea value="${instance.downloadSpec.spec}"/>
+                                                </f:entry>
+                                            </r:blockWrapper>
+                                        </td>
+                                    </tr>
+                                </f:dropdownListBlock>
+
+                                <f:dropdownListBlock value="file" title="${%File}"
+                                                     selected="${instance.downloadSpec.filePath != null}">
+                                    <tr>
+                                        <td>
+                                            <r:blockWrapper style="width:100%" id="DownloadFilePathArea">
+                                                <f:entry title="File Path" field="filePath">
+                                                    <f:textbox value="${instance.downloadSpec.filePath}"/>
+                                                </f:entry>
+                                            </r:blockWrapper>
+                                        </td>
+                                    </tr>
+                                </f:dropdownListBlock>
+
+                            </f:dropdownList>
+                        </r:blockWrapper>
+                    </f:block>
+                </j:when>
+                <j:otherwise>
+                    <r:blockWrapper style="width:100%" id="artifactory-resolver-generic-dd-${uniqueId}">
+                        <f:dropdownList name="legacyResolverDetails"
+                                        title="${%Artifactory download server}">
+                            <j:forEach var="s" items="${descriptor.jfrogInstances}" varStatus="loop">
+                                <f:dropdownListBlock value="${s.instanceId}" title="${s.instanceId} ${s.artifactoryUrl}"
+                                                     selected="${s.instanceId==instance.legacyResolverDetails.artifactoryName}">
+                                    <f:nested>
+                                        <input type="hidden" name="artifactoryName" value="${s.instanceId}"/>
+                                        <input type="hidden" name="artifactoryUrl"
+                                               id="artifactoryUrlResolve${s.artifactoryUrl}"
+                                               value="${s.artifactoryUrl}"/>
+                                        <input type="hidden" name="stapler-class"
+                                               value="org.jfrog.hudson.ServerDetails"/>
+
+                                    </f:nested>
+                                </f:dropdownListBlock>
+                            </j:forEach>
+                        </f:dropdownList>
+                    </r:blockWrapper>
+                    <r:credentials configurationFieldName="resolverCredentialsConfig"
+                                   configurationObject="${instance.resolverCredentialsConfig}"
+                                   blockTitle="Override default download credentials"
+                                   elementId="overridingResolverCredentials-generic-${uniqueId}"/>
+
+                    <f:block>
+                        <r:blockWrapper style="width:100%" id="resolvePatternArea-${uniqueId}">
+                            <f:entry title="Download Artifacts" field="resolvePattern"
+                                     help="/plugin/artifactory/help/common/help-resolvePattern.html">
+                                <f:textarea value="${instance.resolvePattern}"/>
+                            </f:entry>
+                        </r:blockWrapper>
+                        <st:adjunct includes="lib.jfrog.repos.repos"/>
+                    </f:block>
+                </j:otherwise>
+            </j:choose>
+        </f:block>
+
+        <f:section title="More Details">
+            <f:block>
+                <r:blockWrapper style="width:100%">
+                    <f:optionalBlock field="overrideBuildName"
+                                     help="/plugin/artifactory/help/common/help-overrideBuildName.html"
+                                     title="Override build name" inline="true"
+                                     checked="${instance.overrideBuildName}">
+                        <f:block>
+                            <f:entry title="Build name" field="customBuildName"
+                                     help="/plugin/artifactory/help/common/help-customizedBuildName.html">
+                                <f:textbox value="${instance.customBuildName}"/>
+                            </f:entry>
+                        </f:block>
+                    </f:optionalBlock>
+                </r:blockWrapper>
+            </f:block>
+            <f:block>
+                <r:blockWrapper style="width:100%">
+                    <f:optionalBlock name="deployBuildInfo" checked="${h.defaultToTrue(instance.deployBuildInfo)}"
+                                     title="Capture and publish build info"
+                                     help="/plugin/artifactory/help/common/help-deployBuildInfo.html"
+                                     inline="true">
+
+                        <f:optionalBlock name="includeEnvVars" checked="${instance.includeEnvVars}"
+                                         title="Include environment variables"
+                                         help="/plugin/artifactory/help/common/help-includeEnvVars.html"
+                                         inline="true">
+                            <f:block>
+                                <r:blockWrapper style="width:100%">
+                                    <j:set var="envVarsPatterns" value="${instance.envVarsPatterns}"/>
+                                    <f:section name="envVarsPatterns">
+                                        <input type="hidden" name="stapler-class"
+                                               value="org.jfrog.hudson.util.IncludesExcludes"/>
+                                        <f:entry title="Include Patterns" field="includePatterns"
+                                                 help="/plugin/artifactory/help/common/help-envVarsIncludePatterns.html">
+                                            <f:textbox value="${envVarsPatterns.includePatterns}"/>
+                                        </f:entry>
+                                        <f:entry title="Exclude Patterns"
+                                                 field="excludePatterns"
+                                                 help="/plugin/artifactory/help/common/help-envVarsExcludePatterns.html">
+                                            <f:textbox value="${envVarsPatterns.excludePatterns}"
+                                                       default="*password*,*psw*,*secret*,*key*,*token*"/>
+                                        </f:entry>
+                                    </f:section>
+                                </r:blockWrapper>
+                            </f:block>
+                        </f:optionalBlock>
+
+                        <f:optionalBlock name="discardOldBuilds"
+                                         checked="${instance.discardOldBuilds}"
+                                         title="Discard old builds from Artifactory (requires Artifactory Pro)"
+                                         inline="true"
+                                         help="/plugin/artifactory/help/common/help-discardBuilds.html">
+                            <f:entry field="discardBuildArtifacts"
+                                     help="/plugin/artifactory/help/common/help-discardBuildArtifacts.html">
+                                <f:checkbox default="true" checked="${instance.discardBuildArtifacts}"/>
+                                <label class="attach-previous">${%Discard build artifacts}</label>
+                            </f:entry>
+                            <f:entry field="asyncBuildRetention"
+                                     help="/plugin/artifactory/help/common/help-asyncBuildRetention.html">
+                                <f:checkbox default="false" checked="${instance.asyncBuildRetention}"/>
+                                <label class="attach-previous">${%Async}</label>
+                            </f:entry>
+                        </f:optionalBlock>
+
+                    </f:optionalBlock>
+                </r:blockWrapper>
+            </f:block>
+
+            <f:block>
+                <j:if test="${descriptor.isMultiConfProject()}">
+                    <f:block>
+                        <r:blockWrapper style="width:100%">
+                            <f:optionalBlock name="multiConfProject"
+                                             checked="${instance.multiConfProject == null || instance.multiConfProject}"
+                                             title="${%Multi Configuration Upload Matcher}"
+                                             inline="true">
+                                <f:entry field="artifactoryCombinationFilter" title="${%Combination Matches}"
+                                         description="Groovy expression"
+                                         help="/plugin/artifactory/help/common/help-combinationFilter.html">
+                                    <f:textbox value="${instance.artifactoryCombinationFilter}"
+                                               field="artifactoryCombinationFilter"/>
+                                </f:entry>
+                            </f:optionalBlock>
+                        </r:blockWrapper>
+                    </f:block>
+                </j:if>
+            </f:block>
+        </f:section>
+    </f:section>
+    <f:block>
+        <hr/>
+    </f:block>
+</j:jelly>

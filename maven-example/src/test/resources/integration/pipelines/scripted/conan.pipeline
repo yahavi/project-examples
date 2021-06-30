@@ -1,0 +1,25 @@
+package integration.pipelines.scripted
+
+node("TestSlave") {
+    stage "Configure Artifactory"
+    def rtServer = Artifactory.newServer url: "${env.JENKINS_PLATFORM_URL}".replaceFirst('/*$', '')+'/artifactory', username: "${env.JENKINS_ARTIFACTORY_USERNAME}", password: "${env.JENKINS_ARTIFACTORY_PASSWORD}"
+    def buildInfo = Artifactory.newBuildInfo()
+    buildInfo.name = "scripted:conan test"
+    buildInfo.number = "7"
+
+    stage "Configure Conan Client"
+    def conanClient = Artifactory.newConanClient()
+
+    stage "Add Conan Remote"
+    String remoteName = conanClient.remote.add server: rtServer, repo: "${CONAN_LOCAL}"
+
+    stage "Conan Install"
+    conanClient.run(command: "install zlib/1.2.11@conan/stable --build missing", buildInfo: buildInfo)
+
+    stage "Conan Upload"
+    conanClient.run(command: "upload zlib/1.2.11@conan/stable --all -r " + remoteName + " --confirm", buildInfo: buildInfo)
+
+    stage "Publish build info"
+    rtServer.publishBuildInfo buildInfo
+
+}
