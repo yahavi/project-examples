@@ -28,6 +28,7 @@ pipelines:
             - name: yahavTestGit
           integrations:
             - name: jfrog
+            - name: jenkins_id_rsa
         execution:
           onExecute:
             - cd $res_yahavTestGit_resourcePath
@@ -38,6 +39,7 @@ pipelines:
 
             # Configure git
             - git checkout pipelines-test
+            - eval "$(ssh-agent)" && ssh-add ~/.ssh/jenkins_id_rsa
 
             # Download JFrog CLI
             - curl -fL https://getcli.jfrog.io | sh && chmod +x jfrog
