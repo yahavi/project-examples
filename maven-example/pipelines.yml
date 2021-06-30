@@ -37,7 +37,7 @@ pipelines:
             - MVN_PATH=`which mvn` && export M2_HOME=`readlink -f $MVN_PATH | xargs dirname | xargs dirname`
 
             # Configure git
-            - git checkout master
+            - git checkout pipelines-test
 
             # Download JFrog CLI
             - curl -fL https://getcli.jfrog.io | sh && chmod +x jfrog
