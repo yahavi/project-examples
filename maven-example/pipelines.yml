@@ -32,6 +32,7 @@ pipelines:
         execution:
           onExecute:
             - cd $res_yahavTestGit_resourcePath
+            - cd maven-example
 
             # Set env
             - export CI=true
@@ -50,12 +51,10 @@ pipelines:
             - ./jfrog c add ecosys --artifactory-url $int_jfrog_rt_url --user=$int_jfrog_rt_user --password=$int_jfrog_rt_password --enc-password=false
             - ./jfrog c add releases --artifactory-url=https://releases.jfrog.io/artifactory
             - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
-
-            - mvn versions:set -DnewVersion="5.5.5" -B
             
             # Run install and publish
             - >
               env -i PATH=$PATH M2_HOME=$M2_HOME HOME=$HOME
               JFROG_CLI_BUILD_NAME=$JFROG_CLI_BUILD_NAME
               JFROG_CLI_BUILD_NUMBER=$JFROG_CLI_BUILD_NUMBER
-              jfrog rt mvn clean install -U -B -f maven-example
+              jfrog rt mvn clean install -U -B
