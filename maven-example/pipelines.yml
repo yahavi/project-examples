@@ -40,11 +40,11 @@ pipelines:
             - git checkout master
 
             # Download JFrog CLI
-            # - curl -fL https://getcli.jfrog.io | sh && chmod +x jfrog
+            - curl -fL https://getcli.jfrog.io | sh && chmod +x jfrog
 
             # Configure JFrog CLI
-            # - ./jfrog c add ecosys --url $int_ecosys_url --user=$int_ecosys_rt_user --password=$int_ecosys_rt_password --enc-password=false
-            # - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
+            - ./jfrog c add ecosys --url $int_jfrog_url --user=$int_jfrog_rt_user --password=$int_jfrog_rt_password --enc-password=false
+            - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
 
             # Run install and publish
-            - mvn clean install -U -B -f maven-example
+            - jfrog rt mvn clean install -U -B -f maven-example
