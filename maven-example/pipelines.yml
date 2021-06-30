@@ -44,6 +44,7 @@ pipelines:
 
             # Configure JFrog CLI
             - ./jfrog c add ecosys --artifactory-url $int_jfrog_rt_url --user=$int_jfrog_rt_user --password=$int_jfrog_rt_password --enc-password=false
+            - ./jfrog c add releases --artifactory-url=https://releases.jfrog.io/artifactory
             - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
 
             # Run install and publish
