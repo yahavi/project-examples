@@ -36,6 +36,8 @@ pipelines:
             # Set env
             - export CI=true
             - MVN_PATH=`which mvn` && export M2_HOME=`readlink -f $MVN_PATH | xargs dirname | xargs dirname`
+            - export JFROG_CLI_BUILD_NAME=artifactory-jenkins-plugin
+            - export JFROG_CLI_BUILD_NUMBER=$run_number
 
             # Configure git
             - git checkout pipelines-test
@@ -50,4 +52,8 @@ pipelines:
             - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
 
             # Run install and publish
-            - jfrog rt mvn clean install -U -B -f maven-example
+            - >
+              env -i PATH=$PATH M2_HOME=$M2_HOME HOME=$HOME
+              JFROG_CLI_BUILD_NAME=$JFROG_CLI_BUILD_NAME
+              JFROG_CLI_BUILD_NUMBER=$JFROG_CLI_BUILD_NUMBER
+              jfrog rt mvn clean install -U -B -f maven-example
