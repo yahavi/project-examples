@@ -3,7 +3,7 @@ resources:
     type: GitRepo
     configuration:
       path: yahavi/project-examples
-      gitProvider: github
+      gitProvider: yahav_github
       buildOn:
         commit: false
       branches:
