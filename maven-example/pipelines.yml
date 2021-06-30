@@ -47,4 +47,4 @@ pipelines:
             # - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
 
             # Run install and publish
-            - mvn clean install -U -B
+            - mvn clean install -U -B -f maven-example
