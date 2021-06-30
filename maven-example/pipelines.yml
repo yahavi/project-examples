@@ -1,0 +1,53 @@
+resources:
+  - name: yahavTestGit
+    type: GitRepo
+    configuration:
+      path: yahavi/project-examples
+      gitProvider: github
+      buildOn:
+        commit: false
+      branches:
+        include: master
+
+pipelines:
+  - name: build_yahav_test
+    configuration:
+      runtime:
+        type: image
+        image:
+          auto:
+            language: java
+            versions:
+              - "8.0.0"
+
+    steps:
+      - name: Release
+        type: Bash
+        configuration:
+          inputResources:
+            - name: yahavTestGit
+          integrations:
+            - name: jfrog
+        execution:
+          onExecute:
+            - cd $res_yahavTestGit_resourcePath
+
+            # Set env
+            - export CI=true
+            - MVN_PATH=`which mvn` && export M2_HOME=`readlink -f $MVN_PATH | xargs dirname | xargs dirname`
+
+            # Configure git
+            - git checkout master
+
+            # Download JFrog CLI
+            - curl -fL https://getcli.jfrog.io | sh && chmod +x jfrog
+
+            # Configure JFrog CLI
+            - ./jfrog c add ecosys --url $int_ecosys_url --user=$int_ecosys_rt_user --password=$int_ecosys_rt_password --enc-password=false
+            - ./jfrog rt mvnc --server-id-deploy ecosys --repo-deploy-releases libs-release-local --repo-deploy-snapshots libs-snapshot-local
+
+            # Run install and publish
+            - >
+              ./jfrog rt mvn clean install -U -B
+            - ./jfrog rt bag
+            - ./jfrog rt bp
