@@ -22,17 +22,17 @@ allprojects {
   version = '1.0'
   status = 'integration'
 
-  repositories {
-    maven {
-      url System.getenv('ARTIFACTORY_URLL')
-      credentials {
-        username System.getenv('ARTIFACTORY_USRR')
-        password System.getenv('ARTIFACTORY_PSWW')
-      }
-    }
-  }
+  // repositories {
+  //   maven {
+  //     url System.getenv('ARTIFACTORY_URLL')
+  //     credentials {
+  //       username System.getenv('ARTIFACTORY_USRR')
+  //       password System.getenv('ARTIFACTORY_PSWW')
+  //     }
+  //   }
+  // }
 }
 
 // Setting this property to true will make the artifactoryPublish task
 // skip this module (in our case, the root module):
-artifactoryPublish.skip = true
+// artifactoryPublish.skip = true
