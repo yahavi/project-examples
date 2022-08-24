@@ -21,10 +21,6 @@ allprojects {
   group = 'org.jfrog.example.gradle'
   version = '1.0'
   status = 'integration'
-
-  repositories {
-    mavenCentral()
-  }
 }
 
 // Setting this property to true will make the artifactoryPublish task
