@@ -21,6 +21,16 @@ allprojects {
   group = 'org.jfrog.example.gradle'
   version = '1.0'
   status = 'integration'
+
+  repositories {
+    maven {
+      url System.getenv('ARTIFACTORY_URLL')
+      credentials {
+        username System.getenv('ARTIFACTORY_USRR')
+        password System.getenv('ARTIFACTORY_PSWW')
+      }
+    }
+  }
 }
 
 // Setting this property to true will make the artifactoryPublish task
