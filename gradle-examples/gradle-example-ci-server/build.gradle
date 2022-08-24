@@ -31,18 +31,6 @@ allprojects {
       }
     }
   }
-
-  dependencyResolutionManagement {
-    repositories {
-      maven {
-        credentials {
-          username System.getenv('ARTIFACTORY_USR')
-          password System.getenv('ARTIFACTORY_PSW')
-        }
-        url System.getenv('ARTIFACTORY_URL')
-      }
-    }
-  }
 }
 
 // Setting this property to true will make the artifactoryPublish task
