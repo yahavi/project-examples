@@ -15,4 +15,4 @@ steps:
     targetDeployReleaseRepo: 'libs-release-local'
     targetDeploySnapshotRepo: 'libs-snapshot-local'
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.7'
+    jdkVersionOption: '1.8'
