@@ -1,0 +1,24 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: JFrogMaven@1
+  inputs:
+    mavenPomFile: 'maven-examples/maven-example/pom.xml'
+    goals: 'install'
+    artifactoryResolverService: 'ecosys-artifactory'
+    targetResolveReleaseRepo: 'libs-release'
+    targetResolveSnapshotRepo: 'libs-snapsho'
+    artifactoryDeployService: 'ecosys-artifactory'
+    targetDeployReleaseRepo: 'libs-release-local'
+    targetDeploySnapshotRepo: 'libs-snapshot-local'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
