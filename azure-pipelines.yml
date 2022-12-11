@@ -7,7 +7,7 @@ steps:
 - task: JFrogMaven@1
   inputs:
     mavenPomFile: 'maven-examples/maven-example/pom.xml'
-    goals: 'clean install -B'
+    goals: 'clean install -B -X'
     artifactoryResolverService: 'ecosys-artifactory'
     targetResolveReleaseRepo: 'libs-release'
     targetResolveSnapshotRepo: 'libs-snapsho'
