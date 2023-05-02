@@ -1,0 +1,83 @@
+resources:
+  - name: yahavi_cron_trigger
+    type: CronTrigger
+    configuration:
+      interval: "0 * * * *" # Run once per hour
+
+  - name: yahavi_frogbotGitRepo
+    type: GitRepo
+    configuration:
+      gitProvider: yahavi_github
+      path: "{{.jfrog-pipelines.sourceRepository}}"
+      branches:
+        include: ^{{gitBranch}}$
+      cloneProtocol: https
+
+pipelines:
+  - name: Frogbot_yahavi
+    steps:
+      - name: Frogbot_Scan
+        type: Bash
+        configuration:
+          integrations:
+            - name: yahavi_ecosys
+            - name: yahavi_github
+          inputResources:
+            - name: yahavi_cron_trigger
+            - name: yahavi_frogbotGitRepo
+          runtime:
+            type: image
+            image:
+              auto:
+                language: java
+                version: "11"
+          environmentVariables:
+            # [Mandatory]
+            # JFrog platform URL
+            JF_URL: $int_yahavi_ecosys_url
+
+            # [Mandatory if JF_USER and JF_PASSWORD are not provided]
+            # JFrog access token with 'read' permissions for Xray
+            JF_ACCESS_TOKEN: $int_yahavi_ecosys_accessToken
+
+            # [Mandatory for Bitbucket]
+            # Username of the git provider account
+            JF_GIT_USERNAME: ""
+
+            # [Mandatory]
+            # Git provider access token with minimal permissions according to the relevant integration type.
+            # Read more - https://www.jfrog.com/confluence/display/JFROG/Pipelines+Integrations
+            JF_GIT_TOKEN: $int_yahavi_github_token
+
+            # [Mandatory]
+            # Name of your git provider: "bitbucketServer" or "github".
+            JF_GIT_PROVIDER: "github"
+
+            # [Mandatory]
+            # API endpoint to your git provider
+            JF_GIT_API_ENDPOINT: $int_yahavi_github_url
+
+            # [Mandatory]
+            # Git provider project owner.
+            JF_GIT_OWNER: yahavi
+
+            # [Mandatory]
+            # Git repository name
+            JF_GIT_REPO: project-examples
+
+            # [Mandatory]
+            # Repository branch to scan
+            JF_GIT_BASE_BRANCH: $res_yahavi_frogbotGitRepo_gitRepoSourceDefaultBranch
+
+            # [Optional, default: "."]
+            # Relative path to the project in the git repository
+            JF_WORKING_DIR: maven-examples/maven-example/
+        execution:
+          onExecute:
+            - cd $res_yahavi_frogbotGitRepo_resourcePath
+            - env
+            - restore_cache_files maven_cache ~/.m2
+            - curl -fLg "https://releases.jfrog.io/artifactory/frogbot/v2/[RELEASE]/getFrogbot.sh" | sh
+            - ./frogbot scan-pull-requests
+          onComplete:
+            - add_cache_files ~/.m2 maven_cache || true
