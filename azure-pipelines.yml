@@ -1,0 +1,13 @@
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: JfrogCliV2@1
+  inputs:
+    jfrogPlatformConnection: 'ecosys'
+    command: |
+      jf rt ping
+      jf rt ping
