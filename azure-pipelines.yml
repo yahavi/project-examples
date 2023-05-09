@@ -10,5 +10,5 @@ steps:
     jfrogPlatformConnection: 'ecosys'
     command: |
       jf rt ping
-      jf rt ping
+        jf rt ping
       
