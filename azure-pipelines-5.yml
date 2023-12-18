@@ -4,22 +4,22 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: ArtifactoryGradle@1
+
+
+- task: JFrogGradle@1
   inputs:
     gradleBuildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
     workDir: 'gradle-examples/gradle-example-ci-server'
     tasks: 'artifactoryPublish'
-    artifactoryResolverService: 'ecosys'
+    artifactoryResolverService: 'ecosys-artifactory'
     sourceRepo: 'libs-release'
-    # artifactoryDeployerService: 'ecosys'
-    # targetRepo: 'libs-release-local'
+    artifactoryDeployerService: 'ecosys-artifactory'
+    targetRepo: 'libs-release-local'
     useWrapper: true
-    collectBuildInfo: true
-    buildName: '$(Build.DefinitionName)'
-    buildNumber: '$(Build.BuildNumber)'
-    includeEnvVars: true
-- task: ArtifactoryPublishBuildInfo@1
+    javaHomeOption: 'JDKVersion'
+    
+- task: JFrogPublishBuildInfo@1
   inputs:
-    artifactoryService: 'ecosys'
+    artifactoryConnection: 'ecosys-artifactory'
     buildName: '$(Build.DefinitionName)'
     buildNumber: '$(Build.BuildNumber)'
