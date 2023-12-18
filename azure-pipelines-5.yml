@@ -8,16 +8,19 @@ steps:
 
 - task: JFrogGradle@1
   inputs:
-    gradleBuildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
+    gradleBuildFile: 'build.gradle'
     workDir: 'gradle-examples/gradle-example-ci-server'
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys-artifactory'
     sourceRepo: 'libs-release'
     artifactoryDeployerService: 'ecosys-artifactory'
-    targetRepo: 'libs-release-local'
+    targetRepo: 'libs-release'
     useWrapper: true
+    collectBuildInfo: true
+    buildName: '$(Build.DefinitionName)'
+    buildNumber: '$(Build.BuildNumber)'
     javaHomeOption: 'JDKVersion'
-    
+
 - task: JFrogPublishBuildInfo@1
   inputs:
     artifactoryConnection: 'ecosys-artifactory'
