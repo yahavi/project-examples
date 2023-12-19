@@ -7,11 +7,13 @@ steps:
 - task: JFrogGradle@1
   inputs:
     gradleBuildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
+    workDir: 'gradle-examples/gradle-example-ci-server'
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys-artifactory'
     sourceRepo: 'libs-release'
     artifactoryDeployerService: 'ecosys-artifactory'
     targetRepo: 'libs-release'
+    useWrapper: true
     javaHomeOption: 'JDKVersion'
   
 - task: JFrogPublishBuildInfo@1
