@@ -4,8 +4,6 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-
-
 - task: JFrogGradle@1
   inputs:
     gradleBuildFile: 'build.gradle'
