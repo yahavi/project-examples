@@ -12,7 +12,6 @@ steps:
     sourceRepo: 'libs-release'
     artifactoryDeployerService: 'ecosys-artifactory'
     targetRepo: 'libs-release'
-    useWrapper: true
     javaHomeOption: 'JDKVersion'
   
 - task: JFrogPublishBuildInfo@1
