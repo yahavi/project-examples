@@ -6,8 +6,7 @@ pool:
 steps:
 - task: JFrogGradle@1
   inputs:
-    gradleBuildFile: 'build.gradle'
-    workDir: 'gradle-examples/gradle-example-ci-server'
+    gradleBuildFile: 'gradle-examples/gradle-example-ci-server/build.gradle'
     tasks: 'artifactoryPublish'
     artifactoryResolverService: 'ecosys-artifactory'
     sourceRepo: 'libs-release'
