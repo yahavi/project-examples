@@ -38,8 +38,7 @@ jobs:
       uses: jfrog/fly-action@v1
       with:
         url: https://jfmarketing.jfrog.io
-      env:
-        FLY_SECRET: ${{ secrets.FLY_SECRET }}
+        token: ${{ secrets.FLY_SECRET }}
         
     - name: Build with Maven
       run: mvn clean install -B
