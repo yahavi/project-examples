@@ -14,11 +14,11 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: fly_key
     
     defaults:
       run:
@@ -38,6 +38,8 @@ jobs:
       uses: jfrog/fly-action@v1
       with:
         url: https://jfmarketing.jfrog.io
+      env:
+        FLY_SECRET: ${{ secrets.FLY_SECRET }}
         
     - name: Build with Maven
       run: mvn clean install -B
