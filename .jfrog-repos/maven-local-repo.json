@@ -1,0 +1,9 @@
+{
+  "key": "fly-maven-local",
+  "rclass": "local",
+  "packageType": "maven",
+  "description": "Local Maven repository for Fly builds",
+  "repoLayoutRef": "maven-2-default",
+  "xrayIndex": true
+}
+
