@@ -14,6 +14,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   build:
@@ -39,7 +40,6 @@ jobs:
       with:
         url: https://jfmarketing.jfrog.io
         token: ${{ secrets.FLY_SECRET }}
-        oidc-provider-name: ''
         
     - name: Build with Maven
       run: mvn clean install -B
