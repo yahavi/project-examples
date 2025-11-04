@@ -19,7 +19,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -66,6 +66,26 @@ jobs:
       
     - name: Deploy artifacts to JFrog Fly
       run: jf mvn deploy -DskipTests
+      
+    - name: Create GitHub Release
+      if: ${{ github.event.inputs.release_version != '' }}
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.event.inputs.release_version }}
+        release_name: Release ${{ github.event.inputs.release_version }}
+        body: |
+          ## Maven Example Release ${{ github.event.inputs.release_version }}
+          
+          **Artifacts deployed to JFrog Fly:**
+          - maven-local repository
+          
+          **Build Information:**
+          - Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          - Commit: ${{ github.sha }}
+        draft: false
+        prerelease: false
       
     - name: Upload build artifacts to GitHub
       uses: actions/upload-artifact@v4
