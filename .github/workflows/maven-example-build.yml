@@ -46,13 +46,36 @@ jobs:
       with:
         url: https://jfmarketing.jfrog.io
         token: ${{ secrets.FLY_SECRET }}
+        ignore: maven
         
-    - name: Verify Maven is configured for Fly
+    - name: Configure Maven settings for Fly
       run: |
-        echo "Checking Maven settings..."
-        cat ~/.m2/settings.xml || echo "No settings.xml found"
-        echo ""
-        echo "Maven will resolve dependencies from Fly and deploy artifacts to Fly"
+        mkdir -p ~/.m2
+        cat > ~/.m2/settings.xml << EOF
+        <?xml version="1.0" encoding="UTF-8"?>
+        <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+          <servers>
+            <server>
+              <id>fly-maven</id>
+              <username>token</username>
+              <password>${{ secrets.FLY_SECRET }}</password>
+            </server>
+            <server>
+              <id>fly-releases</id>
+              <username>token</username>
+              <password>${{ secrets.FLY_SECRET }}</password>
+            </server>
+            <server>
+              <id>fly-snapshots</id>
+              <username>token</username>
+              <password>${{ secrets.FLY_SECRET }}</password>
+            </server>
+          </servers>
+        </settings>
+        EOF
+        echo "Maven settings.xml created with Fly authentication"
         
     - name: Set Release Version
       if: ${{ github.event.inputs.release_version != '' }}
