@@ -35,17 +35,14 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
-    - name: Setup JFrog CLI
-      uses: jfrog/setup-jfrog-cli@v4
-      env:
-        JF_URL: https://jfmarketing.jfrog.io
-        JF_ACCESS_TOKEN: ${{ secrets.FLY_SECRET }}
-        
-    - name: Configure Maven with JFrog Fly
-      run: jf mvn-config --repo-resolve-releases=fly-maven --repo-resolve-snapshots=fly-maven --repo-deploy-releases=fly-maven-local --repo-deploy-snapshots=fly-maven-local
+    - name: Setup JFrog Fly
+      uses: jfrog/fly-action@v1
+      with:
+        url: https://jfmarketing.jfrog.io
+        token: ${{ secrets.FLY_SECRET }}
         
     - name: Build with Maven
-      run: jf mvn clean install -B
+      run: mvn clean install -B
       
     - name: Run tests
       run: mvn test
