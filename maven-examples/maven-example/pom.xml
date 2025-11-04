@@ -29,6 +29,33 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>fly-maven</id>
+            <name>JFrog Fly Maven Repository</name>
+            <url>https://jfmarketing.jfrog.io/artifactory/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>fly-releases</id>
+            <name>JFrog Fly Releases</name>
+            <url>https://jfmarketing.jfrog.io/artifactory/maven-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>fly-snapshots</id>
+            <name>JFrog Fly Snapshots</name>
+            <url>https://jfmarketing.jfrog.io/artifactory/maven-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <pluginManagement>
             <plugins>
