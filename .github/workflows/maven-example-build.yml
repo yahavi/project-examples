@@ -45,57 +45,6 @@ jobs:
       uses: jfrog/fly-action@v1
       with:
         url: https://jfmarketing.jfrog.io
-        token: ${{ secrets.FLY_SECRET }}
-        ignore: maven
-        
-    - name: Configure Maven settings for Fly
-      env:
-        FLY_TOKEN: ${{ secrets.FLY_SECRET }}
-      run: |
-        mkdir -p ~/.m2
-        cat > ~/.m2/settings.xml << EOF
-        <?xml version="1.0" encoding="UTF-8"?>
-        <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
-          <servers>
-            <server>
-              <id>fly-maven</id>
-              <configuration>
-                <httpHeaders>
-                  <property>
-                    <name>Authorization</name>
-                    <value>Bearer ${FLY_TOKEN}</value>
-                  </property>
-                </httpHeaders>
-              </configuration>
-            </server>
-            <server>
-              <id>fly-releases</id>
-              <configuration>
-                <httpHeaders>
-                  <property>
-                    <name>Authorization</name>
-                    <value>Bearer ${FLY_TOKEN}</value>
-                  </property>
-                </httpHeaders>
-              </configuration>
-            </server>
-            <server>
-              <id>fly-snapshots</id>
-              <configuration>
-                <httpHeaders>
-                  <property>
-                    <name>Authorization</name>
-                    <value>Bearer ${FLY_TOKEN}</value>
-                  </property>
-                </httpHeaders>
-              </configuration>
-            </server>
-          </servers>
-        </settings>
-        EOF
-        echo "Maven settings.xml created with Fly authentication"
         
     - name: Set Release Version
       if: ${{ github.event.inputs.release_version != '' }}
