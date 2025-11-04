@@ -61,18 +61,36 @@ jobs:
           <servers>
             <server>
               <id>fly-maven</id>
-              <username>admin</username>
-              <password>${FLY_TOKEN}</password>
+              <configuration>
+                <httpHeaders>
+                  <property>
+                    <name>Authorization</name>
+                    <value>Bearer ${FLY_TOKEN}</value>
+                  </property>
+                </httpHeaders>
+              </configuration>
             </server>
             <server>
               <id>fly-releases</id>
-              <username>admin</username>
-              <password>${FLY_TOKEN}</password>
+              <configuration>
+                <httpHeaders>
+                  <property>
+                    <name>Authorization</name>
+                    <value>Bearer ${FLY_TOKEN}</value>
+                  </property>
+                </httpHeaders>
+              </configuration>
             </server>
             <server>
               <id>fly-snapshots</id>
-              <username>admin</username>
-              <password>${FLY_TOKEN}</password>
+              <configuration>
+                <httpHeaders>
+                  <property>
+                    <name>Authorization</name>
+                    <value>Bearer ${FLY_TOKEN}</value>
+                  </property>
+                </httpHeaders>
+              </configuration>
             </server>
           </servers>
         </settings>
