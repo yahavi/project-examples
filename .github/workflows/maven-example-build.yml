@@ -41,11 +41,12 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
-    - name: Setup JFrog CLI
-      uses: jfrog/setup-jfrog-cli@v4
-      env:
-        JF_URL: https://jfmarketing.jfrog.io
-        JF_ACCESS_TOKEN: ${{ secrets.FLY_SECRET }}
+    - name: Setup JFrog Fly
+      uses: jfrog/fly-action@v1
+      with:
+        url: https://jfmarketing.jfrog.io
+        token: ${{ secrets.FLY_SECRET }}
+        ignore: maven
         
     - name: Configure Maven for JFrog Fly
       run: |
