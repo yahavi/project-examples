@@ -49,9 +49,11 @@ jobs:
         ignore: maven
         
     - name: Configure Maven settings for Fly
+      env:
+        FLY_TOKEN: ${{ secrets.FLY_SECRET }}
       run: |
         mkdir -p ~/.m2
-        cat > ~/.m2/settings.xml << EOF
+        cat > ~/.m2/settings.xml << 'EOF'
         <?xml version="1.0" encoding="UTF-8"?>
         <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -59,18 +61,18 @@ jobs:
           <servers>
             <server>
               <id>fly-maven</id>
-              <username>token</username>
-              <password>${{ secrets.FLY_SECRET }}</password>
+              <username>admin</username>
+              <password>${env.FLY_TOKEN}</password>
             </server>
             <server>
               <id>fly-releases</id>
-              <username>token</username>
-              <password>${{ secrets.FLY_SECRET }}</password>
+              <username>admin</username>
+              <password>${env.FLY_TOKEN}</password>
             </server>
             <server>
               <id>fly-snapshots</id>
-              <username>token</username>
-              <password>${{ secrets.FLY_SECRET }}</password>
+              <username>admin</username>
+              <password>${env.FLY_TOKEN}</password>
             </server>
           </servers>
         </settings>
