@@ -41,38 +41,30 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
-    - name: Setup JFrog CLI
-      uses: jfrog/setup-jfrog-cli@v4
-      env:
-        JF_URL: https://jfmarketing.jfrog.io
-        JF_ACCESS_TOKEN: ${{ secrets.FLY_SECRET }}
-      
     - name: Setup JFrog Fly
       uses: jfrog/fly-action@v1
       with:
         url: https://jfmarketing.jfrog.io
         token: ${{ secrets.FLY_SECRET }}
-        ignore: maven
         
-    - name: Configure Maven for JFrog Fly
+    - name: Verify Maven is configured for Fly
       run: |
-        jf mvn-config \
-          --repo-resolve-releases=maven \
-          --repo-resolve-snapshots=maven \
-          --repo-deploy-releases=maven-local \
-          --repo-deploy-snapshots=maven-local
+        echo "Checking Maven settings..."
+        cat ~/.m2/settings.xml || echo "No settings.xml found"
+        echo ""
+        echo "Maven will resolve dependencies from Fly and deploy artifacts to Fly"
         
     - name: Set Release Version
       if: ${{ github.event.inputs.release_version != '' }}
       run: |
         echo "Setting release version to ${{ github.event.inputs.release_version }}"
-        jf mvn versions:set -DnewVersion=${{ github.event.inputs.release_version }} -DgenerateBackupPoms=false
+        mvn versions:set -DnewVersion=${{ github.event.inputs.release_version }} -DgenerateBackupPoms=false
         
     - name: Build and Test with Maven
-      run: jf mvn clean install -B
+      run: mvn clean install -B
       
     - name: Deploy artifacts to JFrog Fly
-      run: jf mvn deploy -DskipTests
+      run: mvn deploy -DskipTests
       
     - name: Create GitHub Release
       if: ${{ github.event.inputs.release_version != '' }}
