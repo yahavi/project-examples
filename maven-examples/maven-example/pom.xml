@@ -43,6 +43,20 @@
         </repository>
     </repositories>
 
+    <pluginRepositories>
+        <pluginRepository>
+            <id>fly-maven</id>
+            <name>JFrog Fly Maven Plugin Repository</name>
+            <url>https://jfmarketing.jfrog.io/artifactory/maven</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <distributionManagement>
         <repository>
             <id>fly-releases</id>
