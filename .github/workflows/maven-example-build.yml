@@ -41,6 +41,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         
+    - name: Setup JFrog CLI
+      uses: jfrog/setup-jfrog-cli@v4
+      
     - name: Setup JFrog Fly
       uses: jfrog/fly-action@v1
       with:
