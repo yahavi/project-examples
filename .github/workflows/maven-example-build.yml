@@ -49,16 +49,16 @@ jobs:
           --repo-deploy-releases=maven-local \
           --repo-deploy-snapshots=maven-local
         
-    - name: Build with Maven
+    - name: Build and Test with Maven
       run: jf mvn clean install -B
       
-    - name: Run tests
-      run: mvn test
+    - name: Deploy artifacts to JFrog Fly
+      run: jf mvn deploy -DskipTests
       
-    - name: Package artifacts
-      run: mvn package -DskipTests
+    - name: Publish build info to Fly
+      run: jf rt build-publish
       
-    - name: Upload build artifacts
+    - name: Upload build artifacts to GitHub
       uses: actions/upload-artifact@v4
       with:
         name: maven-artifacts
