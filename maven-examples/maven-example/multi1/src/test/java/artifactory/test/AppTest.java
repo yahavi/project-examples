@@ -11,11 +11,11 @@ public class AppTest
     extends TestCase
 {
     /**
-     * Create the test casedddd
+     * Create the test case
      *
      * @param testName name of the test case
      */
-    pddublic AppTest( String testName )
+    public AppTest( String testName )
     {
         super( testName );
     }
